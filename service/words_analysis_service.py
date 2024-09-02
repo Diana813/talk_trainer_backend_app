@@ -18,7 +18,7 @@ class WordsAnalysisService:
                 matched_words += 1
 
         total_words = len(lector_word_list)
-        success_rate = (matched_words / total_words) if total_words > 0 and matched_words > 0 else 0.1
+        success_rate = min((matched_words / total_words) if total_words > 0 and matched_words > 0 else 0.1, 1)
         return success_rate, ' '.join(lector_word_list), ' '.join(user_word_list)
 
     def get_lector_words_for_time_range(self, start, end, lector_words_filepath):

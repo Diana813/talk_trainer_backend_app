@@ -49,7 +49,7 @@ class Paragraphs:
 
 
 class Alternative:
-    def __init__(self, transcript, confidence, words, paragraphs, entities, translations, topics, summaries=None):
+    def __init__(self, transcript, confidence, words, paragraphs, entities=None, translations=None, topics=None, summaries=None):
         self.transcript = transcript
         self.confidence = confidence
         self.words = [Word(**word) for word in words]
@@ -61,7 +61,7 @@ class Alternative:
 
 
 class Channel:
-    def __init__(self, search, alternatives, detected_language, language_confidence):
+    def __init__(self, alternatives, detected_language, language_confidence, search=None):
         self.search = search
         self.alternatives = [Alternative(**alternative) for alternative in alternatives]
         self.detected_language = detected_language
@@ -81,7 +81,7 @@ class Utterance:
 
 
 class Results:
-    def __init__(self, channels, utterances, summary):
+    def __init__(self, channels, utterances=None, summary=None):
         self.channels = [Channel(**channel) for channel in channels]
         # self.utterances = [Utterance(**utterance) for utterance in utterances]
         # self.summary = summary
@@ -95,8 +95,8 @@ class ModelInfo:
 
 
 class Metadata:
-    def __init__(self, transaction_key, request_id, sha256, created, duration, channels, models, warnings, model_info,
-                 summary_info):
+    def __init__(self, transaction_key=None, request_id=None, sha256=None, created=None, duration=None, channels=None, models=None, model_info=None, warnings=None,
+                 summary_info=None):
         self.transaction_key = transaction_key
         self.request_id = request_id
         self.sha256 = sha256

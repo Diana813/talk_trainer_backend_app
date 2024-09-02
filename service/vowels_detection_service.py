@@ -36,7 +36,7 @@ class VowelsDetectionService:
         return vowel_time_ranges
 
     def find_high_rms(self, audio_signal, sample_rate):
-        frame_length = int(0.1 * sample_rate)
+        frame_length = int(0.01 * sample_rate)
         hop_length = frame_length
 
         rms = feature.rms(y=audio_signal, frame_length=frame_length, hop_length=hop_length)[0]
@@ -50,7 +50,8 @@ class VowelsDetectionService:
                 rms_indices.append(i)
 
         rms_time_ranges = self.indices_to_time_ranges(rms_indices, sample_rate, frame_length)
-        return rms_time_ranges
+        long_time_ranges = self.filter_time_ranges(rms_time_ranges, frame_length, sample_rate)
+        return long_time_ranges
 
     def find_low_zcr(self, audio_signal, sample_rate):
         frame_length = int(0.01 * sample_rate)
@@ -66,12 +67,12 @@ class VowelsDetectionService:
             if zcr[i // hop_length] < zcr_threshold:
                 indices.append(i)
 
-        consonants_time_ranges = self.indices_to_time_ranges(indices, sample_rate, frame_length)
-
-        return consonants_time_ranges
+        low_zcr_time_ranges = self.indices_to_time_ranges(indices, sample_rate, frame_length)
+        long_time_ranges = self.filter_time_ranges(low_zcr_time_ranges, frame_length, sample_rate)
+        return long_time_ranges
 
     def find_high_autocorrelation(self, audio_signal, sample_rate):
-        frame_length = int(0.1 * sample_rate)
+        frame_length = int(0.01 * sample_rate)
         hop_length = frame_length
 
         autocorrelation = self.calculate_autocorrelation(audio_signal, frame_length, hop_length)
@@ -84,8 +85,9 @@ class VowelsDetectionService:
                 indices.append(i)
 
         low_autocorrelation_time_ranges = self.indices_to_time_ranges(indices, sample_rate, frame_length)
+        long_time_ranges = self.filter_time_ranges(low_autocorrelation_time_ranges, frame_length, sample_rate)
 
-        return low_autocorrelation_time_ranges
+        return long_time_ranges
 
     def calculate_autocorrelation(self, y, frame_length, hop_length):
         autocorrelation = []
@@ -158,12 +160,12 @@ class VowelsDetectionService:
         if not vowels:
             return [(start_time, end_time)]
 
-        if start_time < vowels[0][0]:
-            syllables.append((start_time, vowels[0][0]))
-
         for i in range(len(vowels)):
             if i == 0:
-                syllable_start = vowels[0][0]
+                if start_time < vowels[0][0]:
+                    syllable_start = start_time
+                else:
+                    syllable_start = vowels[0][0]
             else:
                 syllable_start = vowels[i - 1][1]
 
@@ -234,3 +236,11 @@ class VowelsDetectionService:
         time_ranges.append((current_start, current_end))
 
         return time_ranges
+
+    @staticmethod
+    def filter_time_ranges(time_ranges, frame_length, sample_rate):
+        min_duration = 3 * frame_length / sample_rate
+
+        filtered_ranges = [time_range for time_range in time_ranges if (time_range[1] - time_range[0]) >= min_duration]
+
+        return filtered_ranges

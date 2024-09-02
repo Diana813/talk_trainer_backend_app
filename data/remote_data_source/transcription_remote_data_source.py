@@ -1,7 +1,7 @@
-import ast
 from deepgram import DeepgramClient, PrerecordedOptions, FileSource
-from utils import keys
+
 from data.model.input_models.transcription_data import JSONResponse
+from utils import keys
 
 
 class TranscriptService:

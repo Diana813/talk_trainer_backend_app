@@ -1,5 +1,6 @@
-from pytube import YouTube
 import os
+
+from pytubefix import YouTube
 
 from service.audio_service import AudioService
 
@@ -13,13 +14,22 @@ class YouTubeDownloader:
             os.makedirs(self.folder_path)
 
     def download_youtube_audio(self, url, file_name='lector_audio.mp3'):
-        yt = YouTube(url)
-        video = yt.streams.filter(only_audio=True).first()
-        video.download(output_path=self.folder_path, filename=file_name)
-        return os.path.join(self.folder_path, file_name)
-
+        try:
+            yt = YouTube(url)
+            video = yt.streams.filter(only_audio=True).first()
+            video.download(output_path=self.folder_path, filename=file_name)
+            return os.path.join(self.folder_path, file_name)
+        except Exception as e:
+            print("download youtube audio error:")
+            print(e)
+            
     def download_youtube_video(self, url, file_name='lector_video.mp4'):
-        yt = YouTube(url)
-        video = yt.streams.first()
-        video.download(output_path=self.folder_path, filename=file_name)
-        return os.path.join(self.folder_path, file_name)
+        try:
+            yt = YouTube(url)
+            video = yt.streams.first()
+            video.download(output_path=self.folder_path, filename=file_name)
+            return os.path.join(self.folder_path, file_name)
+        except Exception as e:
+            print("download youtube video error:")
+            print(e)
+

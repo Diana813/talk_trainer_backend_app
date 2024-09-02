@@ -35,16 +35,16 @@ class FlaskAppWrapper:
         self.file_manager = FileDataManager()
         self.audio_service = AudioService()
 
-        self.user_audio_file_path = os.path.join('../../../user_files', 'user_audio.wav')
-        self.user_words_file_path = os.path.join('../../../user_files', 'user_transcription.json')
-        self.current_time_range_file_path = os.path.join('../../../user_files', 'current_time_range.json')
-        os.makedirs('../../../user_files', exist_ok=True)
+        self.user_audio_file_path = os.path.join('./user_files', 'user_audio.wav')
+        self.user_words_file_path = os.path.join('./user_files', 'user_transcription.json')
+        self.current_time_range_file_path = os.path.join('./user_files', 'current_time_range.json')
+        os.makedirs('./user_files', exist_ok=True)
 
-        self.lector_audio_file_path = os.path.join('../../../lector_files', 'lector_audio.mp3')
-        self.lector_audio_file_path_wav = os.path.join('../../../lector_files', 'lector_audio.wav')
-        self.lector_words_file_path = os.path.join('../../../lector_files', 'lector_words.json')
-        self.video_file_path = os.path.join('../../../lector_files', 'lector_video.mp4')
-        os.makedirs('../../lector_files', exist_ok=True)
+        self.lector_audio_file_path = os.path.join('./lector_files', 'lector_audio.mp3')
+        self.lector_audio_file_path_wav = os.path.join('./lector_files', 'lector_audio.wav')
+        self.lector_words_file_path = os.path.join('./lector_files', 'lector_words.json')
+        self.video_file_path = os.path.join('./lector_files', 'lector_video.mp4')
+        os.makedirs('./lector_files', exist_ok=True)
 
         self.setup_routes()
 
@@ -52,6 +52,8 @@ class FlaskAppWrapper:
         @self.app.route('/api/video')
         def upload_video():
             youtube_url = request.args.get('youtube_url')
+            print("upload video url:")
+            print(youtube_url)
             self.youtube_downloader.download_youtube_video(youtube_url)
 
             content_length = os.path.getsize(self.video_file_path)
@@ -64,18 +66,17 @@ class FlaskAppWrapper:
         @self.app.route('/api/pauses_timestamps', methods=['GET'])
         def get_timestamps():
             youtube_url = request.args.get('youtube_url')
+            print("upload audio url:")
+            print(youtube_url)
             self.youtube_downloader.download_youtube_audio(youtube_url)
-            print("youtube audio downloaded")
             self.audio_service.convert_mp3_to_wav(self.lector_audio_file_path)
 
             lector_transcription = self.transcript_service.get_transcript_data_from_deepgram(
-                self.lector_audio_file_path)  # self.transcript_service.get_transcript_dummy_data()  #
+                self.lector_audio_file_path)
 
-            print("transcription from deepgram ready")
             lector_words = lector_transcription.results.channels[0].alternatives[0].words
 
             pause_times_in_millis = self.pause_analysis_service.get_pauses(lector_words)
-            print("got pauses")
 
             self.file_manager.save_words_to_file(lector_words, self.lector_words_file_path)
 
@@ -159,11 +160,14 @@ class FlaskAppWrapper:
             #helper.run_in_threads(get_pronunciation_data, [], 'pronunciation_data')
 
             helper.wait_for_completion()
+            print("threads completed")
 
             accent_differences, accent_accuracy = helper.results['accent_data']
             lector_intonation, user_intonation, intonation_accuracy = helper.results['intonation_data']
             words_accuracy, transcription_data = helper.results['transcription_data']
             #pronunciation_accuracy = helper.results['pronunciation_data']
+
+            helper.threads.clear()
 
             user_success_rate = UserSuccessRate(words_accuracy, transcription_data, accent_accuracy,
                                                 accent_differences, intonation_accuracy,

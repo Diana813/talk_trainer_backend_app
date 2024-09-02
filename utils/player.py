@@ -23,3 +23,13 @@ def play_audio_segment(audio_segment, sr):
     sd.play(audio_segment, sr)
     sd.wait()
 
+
+def play_audio(filepath):
+    audio = AudioSegment.from_wav(filepath)
+
+    samples = audio.get_array_of_samples()
+    sample_rate = audio.frame_rate
+
+    sd.play(samples, sample_rate)
+    sd.wait()
+

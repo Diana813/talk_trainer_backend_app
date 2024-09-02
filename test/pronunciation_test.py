@@ -7,8 +7,8 @@
 #
 # base_dir = os.path.dirname(__file__)
 #
-# path1 = os.path.join(base_dir, 'accent_audio_test_data\\test1a.wav')
-# path2 = os.path.join(base_dir, 'accent_audio_test_data\\test1b.wav')
+# path1 = os.path.join(base_dir, 'accent_audio_test_data\\test3a.wav')
+# path2 = os.path.join(base_dir, 'accent_audio_test_data\\test3b.wav')
 #
 #
 #

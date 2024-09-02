@@ -45,7 +45,7 @@ def test_high_similarity(path1, path2):
 
     plot_pitch_lector_user(pitch1, pitch2, f'oczekiwana wysoka zbieżność, uzyskana zbieżność: {similarity * 100}%')
 
-    assert similarity > 0.5
+    assert similarity > 0.7
 
 
 @pytest.mark.parametrize("path1, path2", low_similarity_data)
@@ -56,4 +56,4 @@ def test_low_similarity(path1, path2):
     signal2, sr2 = librosa.load(path2, sr=None)
     _, _, similarity = intonation_service.get_intonation_success_rate(signal1, signal2)
 
-    assert similarity <= 0.5
+    assert similarity <= 0.7

@@ -1,4 +1,6 @@
 import threading
+
+
 class ThreadHelper:
     def __init__(self):
         self.threads = []
@@ -18,3 +20,7 @@ class ThreadHelper:
     def wait_for_completion(self):
         for thread in self.threads:
             thread.join()
+
+    def clear(self):
+        self.threads = []
+        self.results = {}
