@@ -51,19 +51,19 @@ class TestPercentOfWordsInOrder(unittest.TestCase):
         lector_words = [self.create_mock_word("these"), self.create_mock_word("are"), self.create_mock_word("not"),
                         self.create_mock_word("same")]
         self.assertEqual(WordsAnalysisService.calculate_word_sequence_accuracy(user_words, lector_words),
-                         (0.1, 'these are not same', 'different words'))
+                         (0.05, 'these are not same', 'different words'))
 
     def test_empty_user_words(self):
         user_words = []
         lector_words = [self.create_mock_word("some"), self.create_mock_word("words")]
         self.assertEqual(WordsAnalysisService.calculate_word_sequence_accuracy(user_words, lector_words),
-                         (0.1, 'some words', ''))
+                         (0.05, 'some words', ''))
 
     def test_empty_lector_words(self):
         user_words = [self.create_mock_word("some"), self.create_mock_word("words")]
         lector_words = []
         self.assertEqual(WordsAnalysisService.calculate_word_sequence_accuracy(user_words, lector_words),
-                         (0.1, '', 'some words'))
+                         (0.05, '', 'some words'))
 
 
 if __name__ == '__main__':

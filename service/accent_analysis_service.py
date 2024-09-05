@@ -26,7 +26,7 @@ class AccentAnalysisService:
         long_words_lector, long_words_user = self.get_long_user_words_matching_lector_words(words_lector, words_user)
 
         if len(long_words_lector) < 1 or len(long_words_user) < 1:
-            return [0.1]
+            return []
 
         difference = []
         with ThreadPoolExecutor() as executor:
@@ -122,7 +122,7 @@ class AccentAnalysisService:
         if utterance_length > 0:
             return (utterance_length - difference_list_length) / utterance_length
         else:
-            return 0
+            return 0.05
 
     @staticmethod
     def calculate_correlation_between_energy(energy1, energy2):
