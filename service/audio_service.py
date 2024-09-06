@@ -12,18 +12,6 @@ class AudioService:
         return wav_file
 
     @staticmethod
-    def change_speed(audio_file, speed=1.0):
-        sound = AudioSegment.from_file(audio_file)
-
-        new_frame_rate = int(sound.frame_rate * speed)
-        sound_with_changed_speed = sound._spawn(sound.raw_data, overrides={
-            "frame_rate": new_frame_rate
-        })
-        sound_with_changed_speed.set_frame_rate(sound.frame_rate)
-
-        return sound_with_changed_speed
-
-    @staticmethod
     def sample_audio_segment_to_draw_chart(audio_segment, num_samples=500):
         length = len(audio_segment)
 

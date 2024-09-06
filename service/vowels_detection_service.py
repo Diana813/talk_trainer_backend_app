@@ -89,115 +89,14 @@ class VowelsDetectionService:
 
         return long_time_ranges
 
-    def calculate_autocorrelation(self, y, frame_length, hop_length):
+    @staticmethod
+    def calculate_autocorrelation(y, frame_length, hop_length):
         autocorrelation = []
         for i in range(0, len(y) - frame_length, hop_length):
             frame = y[i:i + frame_length]
             correlation = np.correlate(frame, frame, mode='full')
             autocorrelation.append(correlation[len(correlation) // 2])
         return np.array(autocorrelation)
-
-    def find_stable_formants(self, audio_signal, sample_rate):
-        temp_file = "temp_audio.wav"
-        sf.write(temp_file, audio_signal, sample_rate)
-        sound = parselmouth.Sound(temp_file)
-
-        time_step = 0.01
-        formant = sound.to_formant_burg(time_step)
-
-        end_time = sound.get_total_duration()
-        times = np.arange(0, end_time, time_step)
-        formant_values = []
-
-        for time in times:
-            f1 = formant.get_value_at_time(1, time)
-            f2 = formant.get_value_at_time(2, time)
-            formant_values.append((time, f1, f2))
-
-        stable_vowel_segments = self.analyze_stability(formant_values)
-        return stable_vowel_segments
-
-    def analyze_stability(self, formant_values, segment_length=0.05):
-        threshold = self.calculate_formants_threshold(formant_values)
-        stable_vowel_segments = []
-
-        segment_start = 0
-        while segment_start < formant_values[-1][0]:
-            segment_end = segment_start + segment_length
-            segment_formants = [vals for vals in formant_values if segment_start <= vals[0] < segment_end]
-
-            f1_values = [f1 for _, f1, _ in segment_formants if f1 is not None]
-            f2_values = [f2 for _, _, f2 in segment_formants if f2 is not None]
-
-            if f1_values and f2_values:
-                f1_mean, f1_std = np.mean(f1_values), np.std(f1_values)
-                f2_mean, f2_std = np.mean(f2_values), np.std(f2_values)
-
-                if f1_std < threshold[0] and f2_std < threshold[1]:
-                    stable_vowel_segments.append((segment_start, segment_end, f1_mean, f2_mean))
-
-            segment_start = segment_end
-
-        return stable_vowel_segments
-
-    @staticmethod
-    def calculate_formants_threshold(formant_values):
-        all_f1_values = [f1 for _, f1, _ in formant_values if f1 is not None]
-        all_f2_values = [f2 for _, _, f2 in formant_values if f2 is not None]
-
-        if not all_f1_values or not all_f2_values:
-            return None, None
-
-        mean_f1_std = np.std(all_f1_values)
-        mean_f2_std = np.std(all_f2_values)
-
-        return mean_f1_std, mean_f2_std
-
-    @staticmethod
-    def find_syllables(start_time, end_time, vowels):
-        syllables = []
-
-        if not vowels:
-            return [(start_time, end_time)]
-
-        for i in range(len(vowels)):
-            if i == 0:
-                if start_time < vowels[0][0]:
-                    syllable_start = start_time
-                else:
-                    syllable_start = vowels[0][0]
-            else:
-                syllable_start = vowels[i - 1][1]
-
-            syllable_end = vowels[i][1]
-            syllables.append((syllable_start, syllable_end))
-
-        if vowels[-1][1] < end_time:
-            syllables.append((vowels[-1][1], end_time))
-
-        return syllables
-
-    @staticmethod
-    def merge_closest_intervals(intervals):
-        if len(intervals) < 2:
-            return intervals
-
-        intervals.sort(key=lambda x: x[0])
-
-        min_gap = float('inf')
-        pair_to_merge = None
-
-        for i in range(len(intervals) - 1):
-            gap = intervals[i + 1][0] - intervals[i][1]
-            if gap < min_gap:
-                min_gap = gap
-                pair_to_merge = i
-
-        if pair_to_merge is not None:
-            merged_interval = (intervals[pair_to_merge][0], intervals[pair_to_merge + 1][1])
-            intervals[pair_to_merge:pair_to_merge + 2] = [merged_interval]
-
-        return intervals
 
     @staticmethod
     def indices_to_time_ranges(indices, sample_rate, frame_length):

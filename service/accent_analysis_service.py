@@ -73,7 +73,6 @@ class AccentAnalysisService:
         energy_user = self.calculate_rms_percentage_for_segments(user_signal, usr, user_vowels)
 
         correlation = self.calculate_correlation_between_energy(energy_lector, energy_user)
-        print(correlation)
 
         return correlation > 0.7
 

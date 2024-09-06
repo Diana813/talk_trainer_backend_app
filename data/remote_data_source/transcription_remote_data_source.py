@@ -37,24 +37,6 @@ class TranscriptService:
         except Exception as e:
             print(f"Exception: {e}")
 
-    # @staticmethod
-    # def get_transcript_dummy_data():
-    #     with open(
-    #             '/audio_speach_analizer_tool/utils/audio_dict.txt',
-    #             'r') as file:
-    #         data = file.read()
-    #     data_dict = ast.literal_eval(data)
-    #     return JSONResponse(**data_dict)
-    #
-    # @staticmethod
-    # def get_user_transcript_dummy_data():
-    #     with open(
-    #             '/audio_speach_analizer_tool/utils/user_audio_dict.txt',
-    #             'r') as file:
-    #         data = file.read()
-    #     data_dict = ast.literal_eval(data)
-    #     return JSONResponse(**data_dict)
-
     @staticmethod
     def _get_default_options():
         return PrerecordedOptions(

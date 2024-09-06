@@ -1,5 +1,6 @@
 import json
 
+
 class UserSuccessRate:
     def __init__(self, words_accuracy, transcription, accent_accuracy, accent, intonation_accuracy, intonation,
                  pronunciation_accuracy):
